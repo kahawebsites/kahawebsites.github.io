@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>WC Sports</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #00c896;
+  --primary-dark: #00a07a;
+  --accent: #ff5f40;
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --bg4: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --text3: #6e7681;
+  --border: #30363d;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --team-primary: #00c896;
+  --team-secondary: #0d1117;
+  --team-accent: #ff5f40;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; }
+
+/* SCREENS */
+.screen { position:fixed; inset:0; display:none; flex-direction:column; background:var(--bg); overflow:hidden; }
+.screen.active { display:flex; }
+.screen-content { flex:1; overflow-y:auto; overflow-x:hidden; padding-bottom:80px; }
+.screen-content::-webkit-scrollbar { display:none; }
+
+/* SPLASH */
+#splash { background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#0d1117 100%); align-items:center; justify-content:center; }
+.splash-logo { text-align:center; animation:splashIn .8s cubic-bezier(.34,1.56,.64,1); }
+.splash-logo h1 { font-family:'Barlow Condensed',sans-serif; font-size:72px; font-weight:900; letter-spacing:-2px; color:var(--primary); text-transform:uppercase; line-height:1; }
+.splash-logo span { color:var(--accent); }
+.splash-logo p { color:var(--text2); font-size:14px; letter-spacing:4px; text-transform:uppercase; margin-top:8px; }
+.splash-loader { margin-top:48px; width:200px; height:3px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.splash-loader-bar { height:100%; width:0; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:2px; animation:load 2s ease forwards; }
+@keyframes load { to { width:100%; } }
+@keyframes splashIn { from { opacity:0; transform:scale(.8) translateY(20px); } to { opacity:1; transform:none; } }
+
+/* AUTH */
+#auth { background:var(--bg); }
+.auth-header { padding:60px 24px 32px; text-align:center; }
+.auth-header h1 { font-family:'Barlow Condensed',sans-serif; font-size:48px; font-weight:900; color:var(--primary); }
+.auth-header h1 span { color:var(--accent); }
+.auth-tabs { display:flex; margin:0 24px; background:var(--bg2); border-radius:var(--radius); padding:4px; }
+.auth-tab { flex:1; padding:10px; text-align:center; border-radius:var(--radius-sm); font-weight:600; font-size:14px; cursor:pointer; transition:all .2s; color:var(--text2); }
+.auth-tab.active { background:var(--primary); color:#000; }
+.auth-form { padding:24px; display:flex; flex-direction:column; gap:16px; }
+.auth-form.hidden { display:none; }
+.field-group { display:flex; flex-direction:column; gap:6px; }
+.field-group label { font-size:12px; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:1px; }
+.field-group input, .field-group select, .field-group textarea { background:var(--bg2); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px; color:var(--text); font-size:15px; font-family:'Barlow',sans-serif; outline:none; transition:border-color .2s; }
+.field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color:var(--primary); }
+.btn { padding:14px 24px; border-radius:var(--radius-sm); font-weight:700; font-size:15px; cursor:pointer; border:none; transition:all .2s; font-family:'Barlow',sans-serif; }
+.btn-primary { background:var(--primary); color:#000; }
+.btn-primary:active { background:var(--primary-dark); transform:scale(.98); }
+.btn-secondary { background:var(--bg3); color:var(--text); border:1.5px solid var(--border); }
+.btn-danger { background:#da3633; color:#fff; }
+.btn-block { width:100%; }
+.btn-accent { background:var(--accent); color:#fff; }
+
+/* MAIN NAV */
+#main { flex-direction:row; overflow:hidden; }
+.main-body { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.bottom-nav { height:64px; background:var(--bg2); border-top:1px solid var(--border); display:flex; align-items:stretch; z-index:100; flex-shrink:0; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; color:var(--text3); transition:color .2s; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+.nav-item.active { color:var(--team-primary, var(--primary)); }
+.nav-item svg { width:22px; height:22px; }
+.badge { background:var(--accent); color:#fff; font-size:9px; font-weight:700; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; position:absolute; top:-4px; right:-4px; }
+.nav-icon-wrap { position:relative; }
+
+/* PAGE HEADERS */
+.page-header { padding:16px 20px; display:flex; align-items:center; gap:12px; background:var(--bg2); border-bottom:1px solid var(--border); flex-shrink:0; }
+.page-header h2 { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:22px; text-transform:uppercase; letter-spacing:1px; flex:1; }
+.page-header .back-btn { width:36px; height:36px; border-radius:50%; background:var(--bg3); border:none; color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.icon-btn { width:36px; height:36px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* TEAM SWITCHER */
+.team-switcher { background:var(--bg2); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; gap:10px; overflow-x:auto; align-items:center; flex-shrink:0; }
+.team-switcher::-webkit-scrollbar { display:none; }
+.team-chip { display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:20px; background:var(--bg3); border:1.5px solid var(--border); cursor:pointer; transition:all .2s; white-space:nowrap; flex-shrink:0; }
+.team-chip.active { border-color:var(--team-primary, var(--primary)); background:rgba(0,200,150,.1); }
+.team-chip-avatar { width:24px; height:24px; border-radius:50%; background:var(--team-primary,var(--primary)); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; color:#000; }
+.team-chip-name { font-size:13px; font-weight:600; }
+.team-chip-add { background:transparent; border-color:var(--border); color:var(--text2); }
+
+/* CARDS */
+.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin:0 16px 12px; }
+.card-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.card-body { padding:16px; }
+.avatar { border-radius:50%; object-fit:cover; background:var(--bg3); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--text); flex-shrink:0; }
+.avatar-sm { width:32px; height:32px; font-size:13px; }
+.avatar-md { width:42px; height:42px; font-size:16px; }
+.avatar-lg { width:56px; height:56px; font-size:22px; }
+
+/* HOME / FEED */
+.feed-banner { margin:16px; border-radius:var(--radius); overflow:hidden; position:relative; height:140px; background:linear-gradient(135deg,var(--team-primary,#00c896),var(--team-secondary,#0d1117)); display:flex; align-items:flex-end; padding:16px; }
+.feed-banner::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.banner-content { position:relative; z-index:1; }
+.banner-team-name { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; text-transform:uppercase; letter-spacing:-0.5px; line-height:1; }
+.banner-team-sport { font-size:13px; opacity:.7; margin-top:3px; }
+.banner-code { position:absolute; top:14px; right:14px; background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.2); border-radius:6px; padding:4px 10px; font-size:11px; font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:2px; }
+
+.post-meta { display:flex; align-items:center; gap:8px; flex:1; }
+.post-meta-info { flex:1; }
+.post-meta-name { font-weight:600; font-size:14px; }
+.post-meta-time { font-size:12px; color:var(--text3); }
+.post-content { padding:12px 16px; font-size:15px; line-height:1.5; }
+.post-img { width:100%; max-height:240px; object-fit:cover; display:block; }
+.post-actions { padding:8px 16px 12px; display:flex; gap:16px; }
+.post-action { display:flex; align-items:center; gap:6px; color:var(--text2); font-size:13px; font-weight:600; cursor:pointer; padding:6px 8px; border-radius:6px; transition:background .2s; }
+.post-action:active { background:var(--bg3); }
+.pinned-label { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--accent); font-weight:600; padding:6px 16px 0; }
+
+/* SECTION HEADERS */
+.section-header { padding:16px 16px 8px; display:flex; align-items:center; justify-content:space-between; }
+.section-header h3 { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+.section-header a { font-size:13px; color:var(--primary); font-weight:600; cursor:pointer; }
+
+/* CALENDAR */
+.cal-header { padding:16px; }
+.cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.cal-nav h3 { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-day-label { text-align:center; font-size:11px; font-weight:700; color:var(--text3); padding:4px 0; }
+.cal-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:13px; font-weight:500; cursor:pointer; position:relative; transition:background .15s; }
+.cal-day:active { background:var(--bg3); }
+.cal-day.today { background:var(--bg3); border:1.5px solid var(--primary); font-weight:700; color:var(--primary); }
+.cal-day.has-event::after { content:''; width:4px; height:4px; border-radius:50%; background:var(--accent); position:absolute; bottom:3px; }
+.cal-day.selected { background:var(--team-primary,var(--primary)); color:#000; font-weight:700; }
+.cal-day.other-month { opacity:.3; }
+.event-list { padding:0 16px; }
+.event-item { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--team-primary,var(--primary)); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:10px; cursor:pointer; }
+.event-item.training { border-left-color:var(--primary); }
+.event-item.game { border-left-color:var(--accent); }
+.event-time { font-size:12px; color:var(--text2); margin-bottom:4px; }
+.event-title { font-weight:600; font-size:15px; }
+.event-meta { font-size:12px; color:var(--text3); margin-top:4px; }
+.event-rsvp { display:flex; gap:8px; margin-top:10px; }
+.rsvp-btn { flex:1; padding:7px; border-radius:6px; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:all .2s; font-family:'Barlow',sans-serif; }
+.rsvp-going { background:rgba(0,200,150,.15); color:var(--primary); border:1px solid var(--primary); }
+.rsvp-going.selected { background:var(--primary); color:#000; }
+.rsvp-not { background:rgba(218,54,51,.1); color:#da3633; border:1px solid #da3633; }
+.rsvp-not.selected { background:#da3633; color:#fff; }
+.rsvp-maybe { background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+.rsvp-maybe.selected { background:var(--bg4); color:var(--text); }
+
+/* MESSAGES */
+.msg-list { }
+.msg-thread { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; }
+.msg-thread:active { background:var(--bg2); }
+.msg-thread-info { flex:1; min-width:0; }
+.msg-thread-name { font-weight:600; font-size:15px; }
+.msg-thread-preview { font-size:13px; color:var(--text3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+.msg-thread-time { font-size:11px; color:var(--text3); }
+.msg-thread-unread { width:8px; height:8px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+.group-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(0,200,150,.1); border:1px solid var(--primary); border-radius:20px; padding:2px 8px; font-size:11px; font-weight:600; color:var(--primary); margin-right:6px; }
+
+/* CHAT VIEW */
+#chat-view { z-index:200; }
+.chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.chat-messages::-webkit-scrollbar { display:none; }
+.msg-bubble-wrap { display:flex; gap:8px; max-width:85%; }
+.msg-bubble-wrap.mine { align-self:flex-end; flex-direction:row-reverse; }
+.msg-bubble { padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.4; }
+.msg-bubble.theirs { background:var(--bg3); border-radius:4px 16px 16px 16px; }
+.msg-bubble.mine { background:var(--team-primary,var(--primary)); color:#000; border-radius:16px 4px 16px 16px; }
+.msg-sender { font-size:11px; color:var(--text3); margin-bottom:2px; font-weight:600; }
+.msg-time { font-size:10px; color:var(--text3); margin-top:3px; text-align:right; }
+.chat-input-bar { padding:10px 16px; background:var(--bg2); border-top:1px solid var(--border); display:flex; gap:10px; align-items:flex-end; flex-shrink:0; }
+.chat-input { flex:1; background:var(--bg3); border:1.5px solid var(--border); border-radius:20px; padding:10px 16px; color:var(--text); font-size:14px; font-family:'Barlow',sans-serif; outline:none; resize:none; max-height:100px; }
+.chat-send { width:40px; height:40px; border-radius:50%; background:var(--team-primary,var(--primary)); border:none; color:#000; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+
+/* PHOTOS */
+.photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; padding:0 0 2px; }
+.photo-item { aspect-ratio:1; overflow:hidden; background:var(--bg3); cursor:pointer; position:relative; }
+.photo-item img { width:100%; height:100%; object-fit:cover; display:block; }
+.photo-item-placeholder { display:flex; align-items:center; justify-content:center; color:var(--text3); }
+.photo-album { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin:0 16px 12px; }
+.photo-album-header { padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.photo-album-title { font-weight:600; font-size:14px; flex:1; }
+.photo-album-count { font-size:12px; color:var(--text3); }
+
+/* MEMBERS */
+.member-item { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); cursor:pointer; }
+.member-info { flex:1; }
+.member-name { font-weight:600; font-size:15px; }
+.member-role { font-size:12px; color:var(--text3); margin-top:2px; }
+.role-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+.role-coach { background:rgba(255,95,64,.15); color:var(--accent); border:1px solid var(--accent); }
+.role-manager { background:rgba(0,200,150,.15); color:var(--primary); border:1px solid var(--primary); }
+.role-player { background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+
+/* ATTENDANCE TAB */
+.attendance-event-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin:0 16px 12px; overflow:hidden; }
+.attendance-event-header { padding:14px 16px; background:linear-gradient(135deg,var(--team-primary,var(--primary)),rgba(0,0,0,.3)); display:flex; justify-content:space-between; align-items:center; }
+.attendance-stats { display:flex; gap:16px; padding:14px 16px; border-bottom:1px solid var(--border); }
+.att-stat { text-align:center; }
+.att-stat-num { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; }
+.att-stat-going { color:var(--primary); }
+.att-stat-not { color:#da3633; }
+.att-stat-maybe { color:#f0a500; }
+.att-stat-label { font-size:11px; color:var(--text3); }
+.attendance-list { }
+.att-member { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border); }
+.att-status { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+.att-going { background:rgba(0,200,150,.2); color:var(--primary); }
+.att-not { background:rgba(218,54,51,.2); color:#da3633; }
+.att-maybe { background:rgba(240,165,0,.2); color:#f0a500; }
+.att-pending { background:var(--bg3); color:var(--text3); }
+
+/* PROFILE */
+.profile-hero { padding:32px 24px 24px; text-align:center; }
+.profile-avatar-wrap { position:relative; display:inline-block; margin-bottom:12px; }
+.profile-avatar { width:80px; height:80px; border-radius:50%; background:var(--bg3); border:3px solid var(--team-primary,var(--primary)); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:700; color:var(--team-primary,var(--primary)); }
+.profile-name { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; }
+.profile-handle { font-size:14px; color:var(--text2); margin-top:2px; }
+.profile-stats { display:flex; justify-content:center; gap:32px; margin-top:20px; }
+.profile-stat { text-align:center; }
+.profile-stat-num { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:700; color:var(--team-primary,var(--primary)); }
+.profile-stat-label { font-size:12px; color:var(--text3); }
+.setting-row { display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid var(--border); cursor:pointer; gap:12px; }
+.setting-row:active { background:var(--bg2); }
+.setting-row-icon { width:36px; height:36px; border-radius:var(--radius-sm); background:var(--bg3); display:flex; align-items:center; justify-content:center; }
+.setting-row-info { flex:1; }
+.setting-row-label { font-weight:600; font-size:14px; }
+.setting-row-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+
+/* TEAM CUSTOMIZE */
+.color-grid { display:flex; flex-wrap:wrap; gap:10px; padding:16px; }
+.color-swatch { width:40px; height:40px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .15s; }
+.color-swatch:active { transform:scale(.9); }
+.color-swatch.selected { border-color:var(--text); box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--text); }
+.layout-option { flex:1; padding:12px; border-radius:var(--radius-sm); border:2px solid var(--border); text-align:center; cursor:pointer; transition:all .2s; }
+.layout-option.selected { border-color:var(--team-primary,var(--primary)); background:rgba(0,200,150,.1); }
+.layout-option-preview { height:48px; border-radius:4px; margin-bottom:6px; }
+.layout-option-label { font-size:12px; font-weight:600; }
+
+/* MODALS */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:300; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal { background:var(--bg2); border-radius:20px 20px 0 0; width:100%; max-height:90vh; overflow-y:auto; padding-bottom:40px; transform:translateY(20px); transition:transform .25s; }
+.modal-overlay.open .modal { transform:none; }
+.modal-handle { width:40px; height:4px; background:var(--bg4); border-radius:2px; margin:12px auto 20px; }
+.modal-header { padding:0 20px 16px; display:flex; align-items:center; justify-content:space-between; }
+.modal-header h3 { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; }
+.modal-body { padding:0 20px; display:flex; flex-direction:column; gap:16px; }
+.modal-close { width:32px; height:32px; border-radius:50%; background:var(--bg3); border:none; color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+/* TEAM CODE */
+.team-code-display { background:var(--bg); border:2px dashed var(--border); border-radius:var(--radius); padding:20px; text-align:center; margin:0 16px; }
+.team-code { font-family:'Barlow Condensed',sans-serif; font-size:36px; font-weight:900; letter-spacing:6px; color:var(--team-primary,var(--primary)); }
+.team-code-sub { font-size:13px; color:var(--text3); margin-top:4px; }
+
+/* TOAST */
+.toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-80px); background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 20px; font-size:14px; font-weight:600; z-index:1000; transition:transform .3s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; box-shadow:var(--shadow); }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-color:var(--primary); color:var(--primary); }
+.toast.error { border-color:var(--accent); color:var(--accent); }
+
+/* TABS */
+.tabs { display:flex; background:var(--bg2); border-bottom:1px solid var(--border); padding:0 16px; flex-shrink:0; overflow-x:auto; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab { padding:12px 16px; font-size:13px; font-weight:600; color:var(--text2); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; white-space:nowrap; }
+.tab.active { color:var(--team-primary,var(--primary)); border-bottom-color:var(--team-primary,var(--primary)); }
+
+/* FAB */
+.fab { position:fixed; bottom:80px; right:20px; width:52px; height:52px; border-radius:50%; background:var(--team-primary,var(--primary)); border:none; color:#000; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,.4); z-index:50; transition:transform .2s; }
+.fab:active { transform:scale(.9); }
+
+/* ONBOARD */
+.onboard-steps { padding:24px; }
+.step-indicator { display:flex; gap:8px; margin-bottom:32px; justify-content:center; }
+.step-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background .3s; }
+.step-dot.active { background:var(--primary); width:24px; border-radius:4px; }
+.onboard-step { display:none; }
+.onboard-step.active { display:block; }
+.onboard-icon { font-size:48px; margin-bottom:16px; }
+.onboard-title { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:800; margin-bottom:8px; }
+.onboard-sub { color:var(--text2); font-size:15px; line-height:1.5; margin-bottom:32px; }
+
+/* EMPTY STATES */
+.empty-state { padding:48px 24px; text-align:center; }
+.empty-state-icon { font-size:48px; margin-bottom:12px; opacity:.5; }
+.empty-state-title { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; color:var(--text2); margin-bottom:4px; }
+.empty-state-sub { font-size:13px; color:var(--text3); }
+
+/* PHOTO LIGHTBOX */
+.lightbox { position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:400; display:none; align-items:center; justify-content:center; flex-direction:column; }
+.lightbox.open { display:flex; }
+.lightbox-close { position:absolute; top:16px; right:16px; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.1); border:none; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lightbox img { max-width:100%; max-height:80vh; border-radius:var(--radius); }
+.lightbox-caption { color:#fff; text-align:center; padding:16px; font-size:14px; opacity:.7; }
+
+/* PROGRESS BARS */
+.progress-bar { background:var(--bg3); border-radius:4px; height:6px; overflow:hidden; margin-top:6px; }
+.progress-fill { height:100%; border-radius:4px; background:var(--team-primary,var(--primary)); transition:width .5s ease; }
+
+/* COLOR SCHEME */
+.scheme-preview { height:32px; border-radius:var(--radius-sm); display:flex; overflow:hidden; cursor:pointer; border:2px solid transparent; margin-bottom:6px; }
+.scheme-swatch { flex:1; }
+.scheme-option { cursor:pointer; }
+.scheme-option.selected .scheme-preview { border-color:var(--text); }
+.scheme-label { font-size:11px; font-weight:600; color:var(--text2); text-align:center; }
+.schemes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:16px; }
+
+/* RICH TEXT */
+.post-type-selector { display:flex; gap:8px; }
+.post-type-btn { padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; border:1.5px solid var(--border); background:var(--bg3); color:var(--text2); cursor:pointer; transition:all .2s; }
+.post-type-btn.active { border-color:var(--team-primary,var(--primary)); color:var(--team-primary,var(--primary)); background:rgba(0,200,150,.1); }
+
+/* UTILITIES */
+.divider { height:1px; background:var(--border); margin:8px 0; }
+.flex { display:flex; }
+.flex-col { flex-direction:column; }
+.gap-8 { gap:8px; }
+.gap-12 { gap:12px; }
+.p-16 { padding:16px; }
+.p-12 { padding:12px; }
+.text-center { text-align:center; }
+.text-sm { font-size:13px; }
+.text-xs { font-size:11px; }
+.text-muted { color:var(--text2); }
+.text-primary { color:var(--team-primary,var(--primary)); }
+.font-bold { font-weight:700; }
+.mt-8 { margin-top:8px; }
+.mt-12 { margin-top:12px; }
+.mt-16 { margin-top:16px; }
+.hidden { display:none !important; }
+.online-dot { width:10px; height:10px; border-radius:50%; background:#3fb950; border:2px solid var(--bg2); position:absolute; bottom:0; right:0; }
+
+/* ANIMATED TRANSITIONS */
+.slide-up { animation:slideUp .3s ease; }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+.fade-in { animation:fadeIn .25s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+/* CUSTOM SCROLL */
+.custom-scroll { overflow-y:auto; }
+.custom-scroll::-webkit-scrollbar { width:3px; }
+.custom-scroll::-webkit-scrollbar-track { background:transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { background:var(--bg4); border-radius:2px; }
+
+/* INPUT TOGGLES */
+.toggle { position:relative; display:inline-block; width:44px; height:24px; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:var(--bg4); border-radius:12px; cursor:pointer; transition:.3s; }
+.toggle-slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.3s; }
+.toggle input:checked + .toggle-slider { background:var(--team-primary,var(--primary)); }
+.toggle input:checked + .toggle-slider:before { transform:translateX(20px); }
+
+/* SWIPE ACTIONS */
+.swipe-action { position:relative; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="screen active" id="splash">
+  <div class="splash-logo">
+    <h1>WC<span>⚡</span>Sports</h1>
+    <p>Your Team. Your Game.</p>
+    <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="screen" id="auth">
+  <div style="overflow-y:auto;flex:1;">
+    <div class="auth-header">
+      <h1>WC<span>⚡</span>Sports</h1>
+      <p style="color:var(--text2);font-size:14px;margin-top:8px;">Connect your team, own the game</p>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">Sign In</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">Sign Up</div>
+    </div>
+    <!-- LOGIN -->
+    <div class="auth-form" id="login-form">
+      <div class="field-group"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"></div>
+      <div class="field-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Sign In</button>
+      <p style="text-align:center;font-size:13px;color:var(--text3);">Demo: any email/password works</p>
+    </div>
+    <!-- REGISTER -->
+    <div class="auth-form hidden" id="register-form">
+      <div class="field-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="John Smith"></div>
+      <div class="field-group"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"></div>
+      <div class="field-group"><label>Password</label><input type="password" id="reg-password" placeholder="••••••••"></div>
+      <div class="field-group"><label>I am a</label>
+        <select id="reg-role">
+          <option value="player">Player</option>
+          <option value="coach">Coach</option>
+          <option value="manager">Manager</option>
+          <option value="parent">Parent / Supporter</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="screen" id="main">
+  <div class="main-body">
+    <!-- Team Switcher -->
+    <div class="team-switcher" id="team-switcher"></div>
+    <!-- Page Views -->
+    <div style="flex:1;overflow:hidden;position:relative;" id="page-container">
+      <!-- HOME -->
+      <div class="screen active" id="page-home" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="screen-content custom-scroll" id="home-content"></div>
+        <button class="fab" onclick="openModal('new-post-modal')">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <!-- CALENDAR -->
+      <div class="screen" id="page-calendar" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="tabs" id="cal-tabs">
+          <div class="tab active" onclick="switchCalTab('schedule')">Schedule</div>
+          <div class="tab" onclick="switchCalTab('calendar')">Calendar</div>
+        </div>
+        <div class="screen-content custom-scroll" id="calendar-content"></div>
+        <button class="fab" onclick="openModal('new-event-modal')">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <!-- MESSAGES -->
+      <div class="screen" id="page-messages" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="page-header"><h2>Messages</h2>
+          <button class="icon-btn" onclick="openModal('new-msg-modal')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          </button>
+        </div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchMsgTab('groups')">Groups</div>
+          <div class="tab" onclick="switchMsgTab('direct')">Direct</div>
+        </div>
+        <div class="screen-content custom-scroll" id="messages-content"></div>
+      </div>
+      <!-- PHOTOS -->
+      <div class="screen" id="page-photos" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="page-header"><h2>Photos</h2>
+          <button class="icon-btn" onclick="openModal('new-album-modal')">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+        <div class="screen-content custom-scroll" id="photos-content"></div>
+      </div>
+      <!-- ATTENDANCE -->
+      <div class="screen" id="page-attendance" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="page-header"><h2>Attendance</h2>
+          <span style="font-size:11px;background:rgba(255,95,64,.15);color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:3px 8px;font-weight:700;">COACH VIEW</span>
+        </div>
+        <div class="screen-content custom-scroll" id="attendance-content"></div>
+      </div>
+      <!-- PROFILE -->
+      <div class="screen" id="page-profile" style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div class="screen-content custom-scroll" id="profile-content"></div>
+      </div>
+    </div>
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav" id="bottom-nav">
+      <div class="nav-item active" onclick="switchPage('home')" id="nav-home">
+        <div class="nav-icon-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        </div>
+        <span>Feed</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('calendar')" id="nav-calendar">
+        <div class="nav-icon-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span>Events</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('messages')" id="nav-messages">
+        <div class="nav-icon-wrap" id="nav-msg-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span class="badge" id="msg-badge">3</span>
+        </div>
+        <span>Chat</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('photos')" id="nav-photos">
+        <div class="nav-icon-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        </div>
+        <span>Photos</span>
+      </div>
+      <div class="nav-item" onclick="switchPage('profile')" id="nav-profile">
+        <div class="nav-icon-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span>Profile</span>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<!-- CHAT VIEW (Full screen overlay) -->
+<div class="screen" id="chat-view">
+  <div class="page-header">
+    <button class="back-btn" onclick="closeChat()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+    </button>
+    <div class="avatar avatar-sm" id="chat-avatar"></div>
+    <div style="flex:1;">
+      <div id="chat-name" style="font-weight:600;font-size:15px;"></div>
+      <div id="chat-sub" style="font-size:12px;color:var(--text3);"></div>
+    </div>
+    <button class="icon-btn" onclick="openModal('chat-info-modal')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </button>
+  </div>
+  <div class="chat-messages custom-scroll" id="chat-messages"></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input" placeholder="Message..." rows="1" oninput="autoResize(this)"></textarea>
+    <button class="chat-send" onclick="sendMessage()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- TEAM SETUP (onboarding) -->
+<div class="screen" id="team-setup">
+  <div style="overflow-y:auto;flex:1;padding-bottom:32px;">
+    <div class="page-header">
+      <button class="back-btn" onclick="closeTeamSetup()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+      </button>
+      <h2 id="setup-title">Create Team</h2>
+    </div>
+    <div class="onboard-steps">
+      <div class="step-indicator" id="step-indicator"></div>
+      <!-- Step 1: Basic Info -->
+      <div class="onboard-step active" id="setup-step-1">
+        <div class="onboard-icon">🏆</div>
+        <div class="onboard-title">Team Details</div>
+        <div class="onboard-sub">Set up the basics for your team</div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="field-group"><label>Team Name</label><input type="text" id="new-team-name" placeholder="Thunder FC"></div>
+          <div class="field-group"><label>Sport</label>
+            <select id="new-team-sport">
+              <option value="football">⚽ Football / Soccer</option>
+              <option value="rugby">🏉 Rugby</option>
+              <option value="basketball">🏀 Basketball</option>
+              <option value="cricket">🏏 Cricket</option>
+              <option value="tennis">🎾 Tennis</option>
+              <option value="hockey">🏒 Hockey</option>
+              <option value="netball">🏐 Netball</option>
+              <option value="swimming">🏊 Swimming</option>
+              <option value="athletics">🏃 Athletics</option>
+              <option value="cycling">🚴 Cycling</option>
+              <option value="golf">⛳ Golf</option>
+              <option value="baseball">⚾ Baseball</option>
+              <option value="softball">🥎 Softball</option>
+              <option value="volleyball">🏐 Volleyball</option>
+              <option value="other">🎯 Other</option>
+            </select>
+          </div>
+          <div class="field-group"><label>Age Group</label>
+            <select id="new-team-age">
+              <option value="u8">Under 8</option>
+              <option value="u10">Under 10</option>
+              <option value="u12">Under 12</option>
+              <option value="u14">Under 14</option>
+              <option value="u16">Under 16</option>
+              <option value="u18">Under 18</option>
+              <option value="senior">Senior / Adult</option>
+              <option value="masters">Masters / Veterans</option>
+            </select>
+          </div>
+          <div class="field-group"><label>Season / Year</label><input type="text" id="new-team-season" placeholder="2025 Season"></div>
+          <div class="field-group"><label>Your Role</label>
+            <select id="new-team-role">
+              <option value="coach">Head Coach</option>
+              <option value="manager">Team Manager</option>
+              <option value="player">Player / Captain</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Step 2: Appearance -->
+      <div class="onboard-step" id="setup-step-2">
+        <div class="onboard-icon">🎨</div>
+        <div class="onboard-title">Team Colours</div>
+        <div class="onboard-sub">Pick your team's primary and secondary colours</div>
+        <div class="field-group" style="margin-bottom:16px;"><label>Primary Colour</label>
+          <div class="color-grid" id="primary-colors"></div>
+          <input type="color" id="primary-custom" value="#00c896" style="margin-top:8px;width:100%;height:40px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;">
+        </div>
+        <div class="field-group"><label>Secondary Colour</label>
+          <div class="color-grid" id="secondary-colors"></div>
+          <input type="color" id="secondary-custom" value="#0d1117" style="margin-top:8px;width:100%;height:40px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;">
+        </div>
+        <div class="field-group" style="margin-top:16px;"><label>Accent Colour</label>
+          <input type="color" id="accent-custom" value="#ff5f40" style="width:100%;height:40px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;">
+        </div>
+        <div style="margin-top:16px;padding:16px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--border);">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Preview</div>
+          <div id="color-preview" style="height:60px;border-radius:var(--radius-sm);background:var(--team-primary,#00c896);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;letter-spacing:1px;color:#000;">TEAM NAME</div>
+        </div>
+      </div>
+      <!-- Step 3: Done -->
+      <div class="onboard-step" id="setup-step-3">
+        <div class="onboard-icon" style="font-size:64px;text-align:center;">🎉</div>
+        <div class="onboard-title" style="text-align:center;">Team Created!</div>
+        <div class="onboard-sub" style="text-align:center;">Your unique team code:</div>
+        <div class="team-code-display" style="margin:0 0 24px;">
+          <div class="team-code" id="new-team-code">------</div>
+          <div class="team-code-sub">Share this code with your team members</div>
+          <button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="copyTeamCode()">📋 Copy Code</button>
+        </div>
+        <div style="font-size:13px;color:var(--text3);text-align:center;line-height:1.6;">Members can join by entering this code in their app under <strong style="color:var(--text2);">Add Team → Join with Code</strong></div>
+      </div>
+      <!-- Navigation Buttons -->
+      <div style="margin-top:24px;display:flex;gap:12px;" id="setup-nav">
+        <button class="btn btn-secondary" id="setup-back-btn" onclick="setupStep(-1)" style="flex:1;display:none;">Back</button>
+        <button class="btn btn-primary" id="setup-next-btn" onclick="setupStep(1)" style="flex:1;">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TEAM CUSTOMIZE -->
+<div class="screen" id="team-customize">
+  <div class="page-header">
+    <button class="back-btn" onclick="showScreen('main')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+    </button>
+    <h2>Customize Team</h2>
+    <button class="btn btn-primary" style="padding:8px 16px;font-size:13px;" onclick="saveTeamCustomize()">Save</button>
+  </div>
+  <div class="screen-content custom-scroll" id="customize-content"></div>
+</div>
+
+<!-- MODALS -->
+<!-- New Post -->
+<div class="modal-overlay" id="new-post-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>New Post</h3><button class="modal-close" onclick="closeModal('new-post-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="post-type-selector">
+        <button class="post-type-btn active" onclick="setPostType(this,'update')">📢 Update</button>
+        <button class="post-type-btn" onclick="setPostType(this,'photo')">📸 Photo</button>
+        <button class="post-type-btn" onclick="setPostType(this,'poll')">📊 Poll</button>
+        <button class="post-type-btn" onclick="setPostType(this,'pinned')">📌 Pinned</button>
+      </div>
+      <div class="field-group"><textarea id="new-post-text" placeholder="What's happening with the team?" style="min-height:100px;" rows="4"></textarea></div>
+      <div class="field-group" id="poll-options" style="display:none;">
+        <label>Poll Options</label>
+        <input type="text" id="poll-opt1" placeholder="Option 1">
+        <input type="text" id="poll-opt2" placeholder="Option 2" style="margin-top:8px;">
+        <button class="btn btn-secondary" style="margin-top:8px;padding:8px;" onclick="addPollOption()">+ Add Option</button>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Event -->
+<div class="modal-overlay" id="new-event-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>New Event</h3><button class="modal-close" onclick="closeModal('new-event-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label>Event Type</label>
+        <select id="event-type">
+          <option value="game">🏆 Game / Match</option>
+          <option value="training">💪 Training / Practice</option>
+          <option value="meeting">📋 Team Meeting</option>
+          <option value="social">🎉 Social Event</option>
+          <option value="trial">🔍 Trials</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Title</label><input type="text" id="event-title" placeholder="Home Game vs City FC"></div>
+      <div class="field-group"><label>Date</label><input type="date" id="event-date"></div>
+      <div class="field-group"><label>Time</label><input type="time" id="event-time"></div>
+      <div class="field-group"><label>Location / Venue</label><input type="text" id="event-location" placeholder="City Stadium, Main Field"></div>
+      <div class="field-group"><label>Notes</label><textarea id="event-notes" placeholder="Meet 30 mins before kickoff..." rows="2"></textarea></div>
+      <div class="field-group" style="flex-direction:row;align-items:center;justify-content:space-between;">
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">RSVP Required</label>
+        <label class="toggle"><input type="checkbox" id="event-rsvp" checked><span class="toggle-slider"></span></label>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitEvent()">Create Event</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Message -->
+<div class="modal-overlay" id="new-msg-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>New Message</h3><button class="modal-close" onclick="closeModal('new-msg-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label>Type</label>
+        <select id="new-msg-type">
+          <option value="direct">Direct Message</option>
+          <option value="group">Group Chat</option>
+        </select>
+      </div>
+      <div class="field-group"><label>Group Name (for group chats)</label><input type="text" id="new-msg-name" placeholder="Training Group, Parents Chat..."></div>
+      <div class="field-group"><label>Select Members</label>
+        <div id="member-select-list" style="max-height:200px;overflow-y:auto;background:var(--bg);border-radius:var(--radius-sm);border:1.5px solid var(--border);padding:8px;"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="startNewChat()">Start Chat</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Album -->
+<div class="modal-overlay" id="new-album-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Add Photos</h3><button class="modal-close" onclick="closeModal('new-album-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label>Album Title</label><input type="text" id="album-title" placeholder="vs City FC - Match Day"></div>
+      <div style="background:var(--bg);border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;" onclick="simulateUpload()">
+        <div style="font-size:32px;margin-bottom:8px;">📸</div>
+        <div style="font-weight:600;color:var(--text2);">Tap to add photos</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Supports JPG, PNG, HEIC</div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitAlbum()">Create Album</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join Team Modal -->
+<div class="modal-overlay" id="join-team-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Join Team</h3><button class="modal-close" onclick="closeModal('join-team-modal')">✕</button></div>
+    <div class="modal-body">
+      <div style="text-align:center;padding:8px 0 16px;">
+        <div style="font-size:32px;margin-bottom:8px;">🔑</div>
+        <div style="color:var(--text2);font-size:14px;">Enter the team code from your coach or team manager</div>
+      </div>
+      <div class="field-group"><label>Team Code</label><input type="text" id="join-code" placeholder="ABC123" style="text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;letter-spacing:4px;text-align:center;"></div>
+      <button class="btn btn-primary btn-block" onclick="joinTeamByCode()">Join Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Info Modal -->
+<div class="modal-overlay" id="chat-info-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Chat Info</h3><button class="modal-close" onclick="closeModal('chat-info-modal')">✕</button></div>
+    <div class="modal-body" id="chat-info-content">
+    </div>
+  </div>
+</div>
+
+<!-- Event Detail Modal -->
+<div class="modal-overlay" id="event-detail-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3 id="event-detail-title">Event</h3><button class="modal-close" onclick="closeModal('event-detail-modal')">✕</button></div>
+    <div class="modal-body" id="event-detail-body"></div>
+  </div>
+</div>
+
+<!-- Add Team Chooser -->
+<div class="modal-overlay" id="add-team-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h3>Add Team</h3><button class="modal-close" onclick="closeModal('add-team-modal')">✕</button></div>
+    <div class="modal-body">
+      <button class="btn btn-primary btn-block" onclick="closeModal('add-team-modal');showTeamSetup(false)">🏆 Create New Team</button>
+      <button class="btn btn-secondary btn-block" onclick="closeModal('add-team-modal');openModal('join-team-modal')">🔑 Join with Code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <img id="lightbox-img" src="" alt="">
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== STATE ====================
+let state = {
+  currentUser: null,
+  teams: [],
+  activeTeamId: null,
+  currentPage: 'home',
+  currentChat: null,
+  currentCalTab: 'schedule',
+  currentMsgTab: 'groups',
+  setupStep: 1,
+  setupMode: 'create', // or 'join'
+  postType: 'update',
+  pollOptionCount: 2,
+};
+
+// ==================== SAMPLE DATA ====================
+const SAMPLE_MEMBERS = [
+  { id: 'm1', name: 'James Wilson', role: 'coach', initials: 'JW', online: true },
+  { id: 'm2', name: 'Sarah Thompson', role: 'manager', initials: 'ST', online: false },
+  { id: 'm3', name: 'Luke Davis', role: 'player', initials: 'LD', online: true },
+  { id: 'm4', name: 'Emma Clarke', role: 'player', initials: 'EC', online: true },
+  { id: 'm5', name: 'Noah Roberts', role: 'player', initials: 'NR', online: false },
+  { id: 'm6', name: 'Olivia Brown', role: 'player', initials: 'OB', online: true },
+  { id: 'm7', name: 'Ethan Taylor', role: 'player', initials: 'ET', online: false },
+  { id: 'm8', name: 'Mia Johnson', role: 'player', initials: 'MJ', online: false },
+  { id: 'm9', name: 'Liam Anderson', role: 'player', initials: 'LA', online: true },
+  { id: 'm10', name: 'Sophia White', role: 'player', initials: 'SW', online: false },
+];
+
+const SAMPLE_POSTS = [
+  { id: 'p1', author: 'm1', text: "Great training session tonight everyone! Really impressed with the passing drills. Let's keep that energy for Saturday's match 💪", time: '2h ago', type: 'update', likes: 12, pinned: false, comments: 4 },
+  { id: 'p2', author: 'm2', text: "REMINDER: Subs for this season are due by end of the month. Please see Sarah or pay via the link in the group chat.", time: '5h ago', type: 'pinned', likes: 6, pinned: true, comments: 2 },
+  { id: 'p3', author: 'm3', text: "Who's bringing snacks to Saturday's game? 🍊 Asking for a friend (it me)", time: '1d ago', type: 'update', likes: 18, pinned: false, comments: 8 },
+  { id: 'p4', author: 'm1', text: "Team selection for Saturday:\n\nGK: Mike\nDef: Luke, Noah, Liam, Ethan\nMid: Emma, Mia, Sophia\nFwd: James, Olivia\n\nSubs: Tom, Ben, Alice\n\nMeet at the ground by 9:30am!", time: '1d ago', type: 'update', likes: 22, pinned: false, comments: 11 },
+];
+
+const SAMPLE_EVENTS = [
+  { id: 'e1', type: 'game', title: 'Home Game vs City FC', date: getDateOffset(2), time: '10:00', location: 'Westfield Park, Field 2', notes: 'Meet 30 mins early for warm up', rsvp: { going: ['m1','m2','m3','m4','m5'], notGoing: ['m7'], maybe: ['m6','m8'] }, userRsvp: 'going' },
+  { id: 'e2', type: 'training', title: 'Weekly Training', date: getDateOffset(4), time: '18:30', location: 'Sports Centre, Pitch B', notes: 'Bring bibs and water', rsvp: { going: ['m1','m2','m3','m4','m5','m6','m9'], notGoing: [], maybe: ['m10'] }, userRsvp: 'going' },
+  { id: 'e3', type: 'meeting', title: 'Season Planning Meeting', date: getDateOffset(7), time: '19:00', location: 'Clubhouse - Meeting Room', notes: 'Parents and players welcome', rsvp: { going: ['m1','m2'], notGoing: ['m5','m7'], maybe: ['m3','m4'] }, userRsvp: null },
+  { id: 'e4', type: 'game', title: 'Away Game vs United', date: getDateOffset(9), time: '14:00', location: 'North City Grounds', notes: 'Carpool available - contact manager', rsvp: { going: ['m1','m3','m4','m6'], notGoing: ['m5'], maybe: ['m2','m7','m8'] }, userRsvp: null },
+  { id: 'e5', type: 'training', title: 'Pre-Match Training', date: getDateOffset(1), time: '17:00', location: 'Westfield Park', notes: 'Light session', rsvp: { going: ['m1','m2','m3','m4','m5','m6','m7','m8','m9'], notGoing: [], maybe: [] }, userRsvp: 'going' },
+];
+
+const SAMPLE_CHATS = [
+  { id: 'c1', type: 'group', name: 'Team Chat', members: ['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10'], lastMsg: "Let's go Saturday! 🔥", lastTime: '2m ago', unread: 2, messages: [
+    { sender: 'm1', text: "Who's ready for training tonight?", time: '6:00 PM' },
+    { sender: 'm3', text: "I'll be there! 🙌", time: '6:02 PM' },
+    { sender: 'm4', text: "Same! Leaving work early 👍", time: '6:15 PM' },
+    { sender: 'm1', text: "Great! See everyone at 6:30. Don't forget boots.", time: '6:20 PM' },
+    { sender: 'm5', text: "Running 10 mins late, hold the warm-up lol", time: '6:25 PM' },
+    { sender: 'm3', text: "Let's go Saturday! 🔥", time: '6:30 PM' },
+  ]},
+  { id: 'c2', type: 'group', name: 'Coaches & Management', members: ['m1','m2'], lastMsg: 'Can we discuss the selection?', lastTime: '1h ago', unread: 1, messages: [
+    { sender: 'm2', text: "Have you finalised the team for Saturday?", time: '3:00 PM' },
+    { sender: 'm1', text: "Almost. I'm debating the midfield setup", time: '3:05 PM' },
+    { sender: 'm2', text: "Can we discuss the selection?", time: '3:10 PM' },
+  ]},
+  { id: 'c3', type: 'group', name: 'Parents Group', members: ['m1','m2','m3','m4','m5','m6'], lastMsg: 'Anyone doing the sausage sizzle?', lastTime: '3h ago', unread: 0, messages: [
+    { sender: 'm4', text: "Anyone doing the sausage sizzle this week?", time: '1:00 PM' },
+    { sender: 'm6', text: "I can do it! Need help though", time: '1:15 PM' },
+    { sender: 'm4', text: "Anyone doing the sausage sizzle?", time: '1:30 PM' },
+  ]},
+  { id: 'c4', type: 'direct', name: 'Sarah Thompson', members: ['m2'], lastMsg: 'See you at training!', lastTime: '5h ago', unread: 0, messages: [
+    { sender: 'm2', text: "Hey! Are you coming to training?", time: '11:00 AM' },
+    { sender: 'me', text: "Yep, be there by 6:30!", time: '11:05 AM' },
+    { sender: 'm2', text: "See you at training!", time: '11:06 AM' },
+  ]},
+  { id: 'c5', type: 'direct', name: 'Luke Davis', members: ['m3'], lastMsg: 'Cheers mate! 👊', lastTime: '1d ago', unread: 0, messages: [
+    { sender: 'm3', text: "Great goal today!", time: '5:00 PM' },
+    { sender: 'me', text: "Thanks, set up by you was perfect", time: '5:02 PM' },
+    { sender: 'm3', text: "Cheers mate! 👊", time: '5:03 PM' },
+  ]},
+];
+
+const SAMPLE_ALBUMS = [
+  { id: 'a1', title: 'Home Game vs Rovers — 15 Jun', date: '15 Jun', photos: ['🏆','⚽','🎉','💪','🏃','👟','🥅','⭐'] },
+  { id: 'a2', title: 'Training — 12 Jun', date: '12 Jun', photos: ['💪','🏃','⚽','👟'] },
+  { id: 'a3', title: 'End of Season Presentation', date: '2 Jun', photos: ['🏆','🎉','🥇','🌟','👏','🍾','🎊','📸','🎯','🔥'] },
+];
+
+const COLOR_PRESETS = [
+  '#00c896','#ff5f40','#3b82f6','#f59e0b','#8b5cf6',
+  '#ec4899','#10b981','#06b6d4','#ef4444','#84cc16',
+  '#f97316','#a78bfa','#22d3ee','#fb7185','#4ade80',
+];
+
+// ==================== UTILS ====================
+function getDateOffset(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function getMember(id) { return SAMPLE_MEMBERS.find(m => m.id === id) || { name: 'Unknown', initials: '?', role: 'player' }; }
+
+function getActiveTeam() { return state.teams.find(t => t.id === state.activeTeamId); }
+
+function isCoachOrManager() {
+  const team = getActiveTeam();
+  return team && (team.myRole === 'coach' || team.myRole === 'manager');
+}
+
+// ==================== INIT ====================
+window.addEventListener('load', () => {
+  // Setup default teams
+  state.teams = [
+    {
+      id: 'team1',
+      name: 'Thunder FC',
+      sport: 'football',
+      sportEmoji: '⚽',
+      ageGroup: 'Senior',
+      season: '2025 Season',
+      myRole: 'coach',
+      code: 'THD742',
+      primaryColor: '#00c896',
+      secondaryColor: '#0d1117',
+      accentColor: '#ff5f40',
+      members: SAMPLE_MEMBERS,
+      posts: [...SAMPLE_POSTS],
+      events: [...SAMPLE_EVENTS],
+      chats: SAMPLE_CHATS.map(c => ({...c, messages: [...c.messages]})),
+      albums: [...SAMPLE_ALBUMS],
+    },
+    {
+      id: 'team2',
+      name: 'Storm Rugby',
+      sport: 'rugby',
+      sportEmoji: '🏉',
+      ageGroup: 'U16',
+      season: '2025',
+      myRole: 'player',
+      code: 'STM991',
+      primaryColor: '#3b82f6',
+      secondaryColor: '#1e3a5f',
+      accentColor: '#f59e0b',
+      members: SAMPLE_MEMBERS.slice(0, 6),
+      posts: [{ id: 'rp1', author: 'm1', text: 'Big match this weekend! Let\'s leave it all on the field 🏉', time: '3h ago', type: 'update', likes: 9, pinned: false, comments: 3 }],
+      events: [{ id: 're1', type: 'game', title: 'Cup Semi-Final', date: getDateOffset(3), time: '13:00', location: 'Rugby Park', notes: '', rsvp: { going: ['m1','m2','m3'], notGoing: [], maybe: ['m4'] }, userRsvp: 'going' }],
+      chats: [SAMPLE_CHATS[0]],
+      albums: [SAMPLE_ALBUMS[0]],
+    }
+  ];
+  state.activeTeamId = 'team1';
+
+  // Show splash then auth
+  setTimeout(() => {
+    showScreen('auth');
+  }, 2500);
+});
+
+// ==================== SCREENS ====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ==================== AUTH ====================
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+  document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value || 'demo@wcsports.com';
+  const name = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+  state.currentUser = { name: name || 'Demo User', email, role: 'coach', initials: (name||'DU').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
+  enterApp();
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value || 'New User';
+  const email = document.getElementById('reg-email').value || 'user@demo.com';
+  const role = document.getElementById('reg-role').value;
+  state.currentUser = { name, email, role, initials: name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
+  enterApp();
+}
+
+function enterApp() {
+  applyTeamTheme();
+  showScreen('main');
+  renderTeamSwitcher();
+  switchPage('home');
+  showToast('Welcome to WC Sports! 👋', 'success');
+}
+
+// ==================== THEME ====================
+function applyTeamTheme() {
+  const team = getActiveTeam();
+  if (!team) return;
+  document.documentElement.style.setProperty('--team-primary', team.primaryColor);
+  document.documentElement.style.setProperty('--team-secondary', team.secondaryColor);
+  document.documentElement.style.setProperty('--team-accent', team.accentColor);
+}
+
+// ==================== NAVIGATION ====================
+function switchPage(page) {
+  state.currentPage = page;
+  document.querySelectorAll('#page-container .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItem = document.getElementById('nav-' + page);
+  if (navItem) navItem.classList.add('active');
+
+  // Handle attendance tab visibility
+  const attNav = document.querySelector('#bottom-nav .nav-item[onclick*="attendance"]');
+  
+  switch(page) {
+    case 'home': renderHome(); break;
+    case 'calendar': renderCalendar(); break;
+    case 'messages': renderMessages(); break;
+    case 'photos': renderPhotos(); break;
+    case 'attendance': renderAttendance(); break;
+    case 'profile': renderProfile(); break;
+  }
+}
+
+// ==================== TEAM SWITCHER ====================
+function renderTeamSwitcher() {
+  const el = document.getElementById('team-switcher');
+  el.innerHTML = state.teams.map(t => `
+    <div class="team-chip ${t.id === state.activeTeamId ? 'active' : ''}" onclick="selectTeam('${t.id}')" style="border-color:${t.id === state.activeTeamId ? t.primaryColor : 'var(--border)'};">
+      <div class="team-chip-avatar" style="background:${t.primaryColor};">${t.name.charAt(0)}</div>
+      <span class="team-chip-name">${t.name}</span>
+    </div>
+  `).join('') + `<div class="team-chip team-chip-add" onclick="openModal('add-team-modal')">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    <span class="team-chip-name">Add Team</span>
+  </div>`;
+
+  // Show/hide attendance tab based on role
+  updateNavForRole();
+}
+
+function updateNavForRole() {
+  const bottomNav = document.getElementById('bottom-nav');
+  // Remove existing attendance nav if any
+  const existingAtt = document.querySelector('.nav-item[data-page="attendance"]');
+  if (existingAtt) existingAtt.remove();
+
+  if (isCoachOrManager()) {
+    // Replace photos with photos + attendance or insert attendance
+    const nav = document.getElementById('bottom-nav');
+    const attHTML = `<div class="nav-item" data-page="attendance" id="nav-attendance" onclick="switchPage('attendance')">
+      <div class="nav-icon-wrap">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <span>Attend</span>
+    </div>`;
+    // Insert before profile
+    const profileNav = document.getElementById('nav-profile');
+    profileNav.insertAdjacentHTML('beforebegin', attHTML);
+    document.getElementById('page-attendance').classList.remove('hidden');
+  }
+}
+
+function selectTeam(id) {
+  state.activeTeamId = id;
+  applyTeamTheme();
+  renderTeamSwitcher();
+  switchPage(state.currentPage);
+}
+
+// ==================== HOME / FEED ====================
+function renderHome() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('home-content');
+
+  // Next event
+  const nextEvent = team.events.sort((a,b) => a.date.localeCompare(b.date)).find(e => e.date >= new Date().toISOString().split('T')[0]);
+
+  el.innerHTML = `
+    <div class="fade-in">
+      <div class="feed-banner">
+        <span class="banner-code">${team.code}</span>
+        <div class="banner-content">
+          <div class="banner-team-name">${team.sportEmoji || '🏆'} ${team.name}</div>
+          <div class="banner-team-sport">${team.sport ? team.sport.charAt(0).toUpperCase()+team.sport.slice(1) : ''} · ${team.ageGroup || ''} · ${team.members?.length || 0} Members</div>
+        </div>
+      </div>
+      ${nextEvent ? `
+      <div class="card" style="margin:0 16px 12px;background:linear-gradient(135deg,var(--bg2),var(--bg3));border-color:var(--team-primary,var(--primary));" onclick="showEventDetail('${nextEvent.id}')">
+        <div class="card-body" style="display:flex;gap:12px;align-items:center;">
+          <div style="width:48px;height:48px;border-radius:var(--radius-sm);background:var(--team-primary,var(--primary));display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:10px;font-weight:700;color:#000;text-transform:uppercase;">${new Date(nextEvent.date+'T00:00:00').toLocaleString('en',{month:'short'})}</span>
+            <span style="font-size:20px;font-weight:800;color:#000;line-height:1;">${new Date(nextEvent.date+'T00:00:00').getDate()}</span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600;">Next ${nextEvent.type}</div>
+            <div style="font-weight:700;font-size:15px;margin-top:2px;">${nextEvent.title}</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px;">🕐 ${nextEvent.time} · 📍 ${nextEvent.location}</div>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+        </div>
+      </div>` : ''}
+      <div class="section-header"><h3>📢 Team Feed</h3></div>
+      ${team.posts.map(post => renderPost(post)).join('')}
+    </div>
+  `;
+}
+
+function renderPost(post) {
+  const author = getMember(post.author);
+  const isPinned = post.type === 'pinned';
+  return `
+    <div class="card slide-up">
+      ${isPinned ? '<div class="pinned-label"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> PINNED</div>' : ''}
+      <div class="card-header">
+        <div class="avatar avatar-sm" style="background:var(--team-primary,var(--primary));color:#000;">${author.initials}</div>
+        <div class="post-meta-info">
+          <div class="post-meta-name">${author.name}</div>
+          <div class="post-meta-time">${post.time} · <span class="role-badge role-${author.role}" style="font-size:9px;">${author.role}</span></div>
+        </div>
+      </div>
+      <div class="post-content" style="white-space:pre-line;">${post.text}</div>
+      <div class="post-actions">
+        <div class="post-action" onclick="likePost('${post.id}')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          ${post.likes}
+        </div>
+        <div class="post-action">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          ${post.comments}
+        </div>
+        <div class="post-action">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function likePost(id) {
+  const team = getActiveTeam();
+  const post = team.posts.find(p => p.id === id);
+  if (post) { post.likes++; renderHome(); }
+}
+
+function setPostType(btn, type) {
+  state.postType = type;
+  document.querySelectorAll('.post-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('poll-options').style.display = type === 'poll' ? 'flex' : 'none';
+}
+
+function addPollOption() {
+  state.pollOptionCount++;
+  const el = document.getElementById('poll-options');
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = `Option ${state.pollOptionCount}`;
+  inp.style.marginTop = '8px';
+  el.insertBefore(inp, el.lastElementChild);
+}
+
+function submitPost() {
+  const text = document.getElementById('new-post-text').value.trim();
+  if (!text) { showToast('Please write something!', 'error'); return; }
+  const team = getActiveTeam();
+  team.posts.unshift({
+    id: 'p' + Date.now(),
+    author: 'm1',
+    text,
+    time: 'Just now',
+    type: state.postType,
+    likes: 0,
+    pinned: state.postType === 'pinned',
+    comments: 0
+  });
+  closeModal('new-post-modal');
+  document.getElementById('new-post-text').value = '';
+  renderHome();
+  showToast('Post published! 📢', 'success');
+}
+
+// ==================== CALENDAR ====================
+function switchCalTab(tab) {
+  state.currentCalTab = tab;
+  document.querySelectorAll('#cal-tabs .tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'schedule')));
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('calendar-content');
+  if (state.currentCalTab === 'schedule') {
+    renderSchedule(el, team);
+  } else {
+    renderCalendarView(el, team);
+  }
+}
+
+function renderSchedule(el, team) {
+  const sorted = [...team.events].sort((a,b) => a.date.localeCompare(b.date));
+  const today = new Date().toISOString().split('T')[0];
+  const upcoming = sorted.filter(e => e.date >= today);
+  const past = sorted.filter(e => e.date < today);
+
+  el.innerHTML = `<div class="fade-in">
+    <div class="section-header"><h3>Upcoming</h3></div>
+    ${upcoming.length ? upcoming.map(e => renderEventCard(e)).join('') : '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-title">No Upcoming Events</div></div>'}
+    ${past.length ? `<div class="section-header"><h3>Past Events</h3></div>${past.reverse().slice(0,3).map(e => renderEventCard(e, true)).join('')}` : ''}
+  </div>`;
+}
+
+function renderEventCard(event, past = false) {
+  const typeColors = { game: 'var(--accent)', training: 'var(--primary)', meeting: '#3b82f6', social: '#f59e0b', trial: '#8b5cf6' };
+  const typeIcons = { game: '🏆', training: '💪', meeting: '📋', social: '🎉', trial: '🔍' };
+  const color = typeColors[event.type] || 'var(--primary)';
+  const going = event.rsvp.going.length;
+  const notGoing = event.rsvp.notGoing.length;
+  const maybe = event.rsvp.maybe.length;
+
+  return `<div class="event-item ${event.type} ${past ? '' : ''}" style="border-left-color:${color};opacity:${past?'.6':'1'};" onclick="showEventDetail('${event.id}')">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:16px;">${typeIcons[event.type]||'📅'}</span>
+      <div style="flex:1;">
+        <div class="event-title">${event.title}</div>
+        <div class="event-time">${formatDate(event.date)} · ${event.time}</div>
+        <div class="event-meta">📍 ${event.location}</div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:var(--text3);">
+        <div style="color:var(--primary);font-weight:600;">${going} going</div>
+        <div>${maybe} maybe</div>
+      </div>
+    </div>
+    ${!past ? `<div class="event-rsvp" onclick="event.stopPropagation()">
+      <button class="rsvp-btn rsvp-going ${event.userRsvp==='going'?'selected':''}" onclick="rsvp('${event.id}','going')">✓ Going</button>
+      <button class="rsvp-btn rsvp-not ${event.userRsvp==='notGoing'?'selected':''}" onclick="rsvp('${event.id}','notGoing')">✗ Can't Go</button>
+      <button class="rsvp-btn rsvp-maybe ${event.userRsvp==='maybe'?'selected':''}" onclick="rsvp('${event.id}','maybe')">? Maybe</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderCalendarView(el, team) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today = now.getDate();
+
+  // Get event dates
+  const eventDates = new Set(team.events.map(e => new Date(e.date+'T00:00:00').getDate()));
+
+  let calHTML = `<div class="cal-header">
+    <div class="cal-nav">
+      <button class="icon-btn">‹</button>
+      <h3>${months[month]} ${year}</h3>
+      <button class="icon-btn">›</button>
+    </div>
+    <div class="cal-grid">
+      ${['S','M','T','W','T','F','S'].map(d=>`<div class="cal-day-label">${d}</div>`).join('')}
+      ${Array(firstDay).fill('<div></div>').join('')}
+      ${Array.from({length:daysInMonth},(_,i)=>{
+        const d = i+1;
+        const isToday = d === today;
+        const hasEvent = eventDates.has(d);
+        return `<div class="cal-day ${isToday?'today':''} ${hasEvent?'has-event':''}">${d}</div>`;
+      }).join('')}
+    </div>
+  </div>
+  <div class="section-header"><h3>This Month's Events</h3></div>
+  <div class="event-list">
+    ${team.events.filter(e => new Date(e.date+'T00:00:00').getMonth() === month).sort((a,b)=>a.date.localeCompare(b.date)).map(e=>renderEventCard(e)).join('')}
+  </div>`;
+
+  el.innerHTML = `<div class="fade-in">${calHTML}</div>`;
+}
+
+function rsvp(eventId, status) {
+  const team = getActiveTeam();
+  const event = team.events.find(e => e.id === eventId);
+  if (!event) return;
+  event.userRsvp = status;
+  renderCalendar();
+  const msg = status === 'going' ? "You're going! 🎉" : status === 'notGoing' ? "RSVP updated" : "Marked as maybe";
+  showToast(msg, 'success');
+}
+
+function submitEvent() {
+  const title = document.getElementById('event-title').value.trim();
+  const date = document.getElementById('event-date').value;
+  if (!title || !date) { showToast('Please fill in title and date', 'error'); return; }
+  const team = getActiveTeam();
+  team.events.push({
+    id: 'e' + Date.now(),
+    type: document.getElementById('event-type').value,
+    title,
+    date,
+    time: document.getElementById('event-time').value || '12:00',
+    location: document.getElementById('event-location').value || 'TBA',
+    notes: document.getElementById('event-notes').value || '',
+    rsvp: { going: [], notGoing: [], maybe: [] },
+    userRsvp: null
+  });
+  closeModal('new-event-modal');
+  renderCalendar();
+  showToast('Event created! 📅', 'success');
+}
+
+function showEventDetail(id) {
+  const team = getActiveTeam();
+  const event = team.events.find(e => e.id === id);
+  if (!event) return;
+  document.getElementById('event-detail-title').textContent = event.title;
+  const going = event.rsvp.going.map(id => getMember(id));
+  const notGoing = event.rsvp.notGoing.map(id => getMember(id));
+  const maybe = event.rsvp.maybe.map(id => getMember(id));
+  document.getElementById('event-detail-body').innerHTML = `
+    <div style="background:var(--bg);border-radius:var(--radius);padding:16px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px;">Date</div><div style="font-weight:600;">${formatDate(event.date)}</div></div>
+        <div><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px;">Time</div><div style="font-weight:600;">${event.time}</div></div>
+        <div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px;">Location</div><div style="font-weight:600;">${event.location}</div></div>
+        ${event.notes ? `<div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:4px;">Notes</div><div style="font-size:14px;color:var(--text2);">${event.notes}</div></div>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <div style="flex:1;text-align:center;padding:12px;background:rgba(0,200,150,.1);border-radius:var(--radius-sm);border:1px solid var(--primary);">
+        <div style="font-size:22px;font-weight:700;color:var(--primary);">${going.length}</div>
+        <div style="font-size:11px;color:var(--text3);">Going</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:12px;background:rgba(218,54,51,.1);border-radius:var(--radius-sm);border:1px solid #da3633;">
+        <div style="font-size:22px;font-weight:700;color:#da3633;">${notGoing.length}</div>
+        <div style="font-size:11px;color:var(--text3);">Can't Go</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:12px;background:rgba(240,165,0,.1);border-radius:var(--radius-sm);border:1px solid #f0a500;">
+        <div style="font-size:22px;font-weight:700;color:#f0a500;">${maybe.length}</div>
+        <div style="font-size:11px;color:var(--text3);">Maybe</div>
+      </div>
+    </div>
+    ${going.length ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✓ Going (${going.length})</div>${going.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;"><div class="avatar avatar-sm" style="background:var(--team-primary,var(--primary));color:#000;">${m.initials}</div><span style="font-size:14px;">${m.name}</span></div>`).join('')}</div>` : ''}
+    ${notGoing.length ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✗ Can't Go (${notGoing.length})</div>${notGoing.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;"><div class="avatar avatar-sm" style="background:var(--bg4);color:var(--text);">${m.initials}</div><span style="font-size:14px;">${m.name}</span></div>`).join('')}</div>` : ''}
+    <div class="event-rsvp">
+      <button class="rsvp-btn rsvp-going ${event.userRsvp==='going'?'selected':''}" onclick="rsvp('${event.id}','going');closeModal('event-detail-modal')">✓ Going</button>
+      <button class="rsvp-btn rsvp-not ${event.userRsvp==='notGoing'?'selected':''}" onclick="rsvp('${event.id}','notGoing');closeModal('event-detail-modal')">✗ Can't Go</button>
+      <button class="rsvp-btn rsvp-maybe ${event.userRsvp==='maybe'?'selected':''}" onclick="rsvp('${event.id}','maybe');closeModal('event-detail-modal')">? Maybe</button>
+    </div>
+  `;
+  openModal('event-detail-modal');
+}
+
+// ==================== MESSAGES ====================
+function switchMsgTab(tab) {
+  state.currentMsgTab = tab;
+  document.querySelectorAll('#page-messages .tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'groups')));
+  renderMessages();
+}
+
+function renderMessages() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('messages-content');
+  const chats = state.currentMsgTab === 'groups'
+    ? team.chats.filter(c => c.type === 'group')
+    : team.chats.filter(c => c.type === 'direct');
+
+  el.innerHTML = `<div class="fade-in">
+    ${chats.length ? chats.map(chat => `
+      <div class="msg-thread" onclick="openChat('${chat.id}')">
+        <div style="position:relative;">
+          <div class="avatar avatar-md" style="background:${chat.type==='group'?'var(--team-primary,var(--primary))':'var(--bg4)'};color:${chat.type==='group'?'#000':'var(--text)'};">
+            ${chat.type === 'group' ? chat.name.charAt(0) : getMember(chat.members[0])?.initials || '?'}
+          </div>
+          ${chat.type==='direct' ? '<div class="online-dot"></div>' : ''}
+        </div>
+        <div class="msg-thread-info">
+          <div style="display:flex;align-items:center;gap:6px;">
+            ${chat.type==='group'?'<span class="group-chip">group</span>':''}
+            <span class="msg-thread-name">${chat.name}</span>
+          </div>
+          <div class="msg-thread-preview">${chat.lastMsg}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <span class="msg-thread-time">${chat.lastTime}</span>
+          ${chat.unread > 0 ? `<div style="background:var(--team-primary,var(--primary));color:#000;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px;min-width:18px;text-align:center;">${chat.unread}</div>` : ''}
+        </div>
+      </div>
+    `).join('') : `
+      <div class="empty-state">
+        <div class="empty-state-icon">💬</div>
+        <div class="empty-state-title">No ${state.currentMsgTab === 'groups' ? 'Group Chats' : 'Direct Messages'}</div>
+        <div class="empty-state-sub">Start a conversation with your team</div>
+      </div>
+    `}
+  </div>`;
+
+  // Populate member select list
+  const memberList = document.getElementById('member-select-list');
+  if (memberList) {
+    memberList.innerHTML = (team.members || SAMPLE_MEMBERS).map(m => `
+      <label style="display:flex;align-items:center;gap:10px;padding:8px;cursor:pointer;">
+        <input type="checkbox" value="${m.id}" style="accent-color:var(--team-primary,var(--primary));">
+        <div class="avatar avatar-sm" style="background:var(--bg4);">${m.initials}</div>
+        <span style="font-size:14px;font-weight:500;">${m.name}</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text3);">${m.role}</span>
+      </label>
+    `).join('');
+  }
+}
+
+function openChat(chatId) {
+  const team = getActiveTeam();
+  const chat = team.chats.find(c => c.id === chatId);
+  if (!chat) return;
+  state.currentChat = chat;
+  chat.unread = 0;
+
+  document.getElementById('chat-avatar').textContent = chat.type === 'group' ? chat.name.charAt(0) : getMember(chat.members[0])?.initials || '?';
+  document.getElementById('chat-avatar').style.background = chat.type === 'group' ? 'var(--team-primary,var(--primary))' : 'var(--bg4)';
+  document.getElementById('chat-avatar').style.color = chat.type === 'group' ? '#000' : 'var(--text)';
+  document.getElementById('chat-name').textContent = chat.name;
+  document.getElementById('chat-sub').textContent = chat.type === 'group' ? `${chat.members.length} members` : 'Direct Message';
+
+  // Info modal
+  document.getElementById('chat-info-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <div class="avatar avatar-lg" style="margin:0 auto 12px;background:var(--team-primary,var(--primary));color:#000;">${chat.name.charAt(0)}</div>
+      <div style="font-size:20px;font-weight:700;">${chat.name}</div>
+      <div style="font-size:13px;color:var(--text3);">${chat.type === 'group' ? `Group · ${chat.members.length} members` : 'Direct Message'}</div>
+    </div>
+    ${chat.type === 'group' ? `<div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Members</div>
+    ${chat.members.map(id => {
+      const m = getMember(id);
+      return `<div class="member-item" style="padding:8px 0;border:none;border-bottom:1px solid var(--border);">
+        <div class="avatar avatar-sm" style="background:var(--bg3);">${m.initials}</div>
+        <div class="member-info"><div class="member-name" style="font-size:14px;">${m.name}</div></div>
+        <span class="role-badge role-${m.role}">${m.role}</span>
+      </div>`;
+    }).join('')}` : ''}
+  `;
+
+  renderChatMessages();
+  showScreen('chat-view');
+}
+
+function renderChatMessages() {
+  const chat = state.currentChat;
+  if (!chat) return;
+  const el = document.getElementById('chat-messages');
+  el.innerHTML = chat.messages.map(msg => {
+    const isMe = msg.sender === 'me';
+    const member = isMe ? state.currentUser : getMember(msg.sender);
+    const initials = isMe ? (state.currentUser?.initials || 'ME') : member.initials;
+    return `
+      <div class="msg-bubble-wrap ${isMe ? 'mine' : ''}">
+        ${!isMe ? `<div class="avatar avatar-sm" style="background:var(--bg3);flex-shrink:0;">${initials}</div>` : ''}
+        <div>
+          ${!isMe ? `<div class="msg-sender">${member.name}</div>` : ''}
+          <div class="msg-bubble ${isMe ? 'mine' : 'theirs'}">${msg.text}</div>
+          <div class="msg-time">${msg.time}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const chat = state.currentChat;
+  const now = new Date();
+  const time = now.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+  chat.messages.push({ sender: 'me', text, time });
+  chat.lastMsg = text;
+  chat.lastTime = 'Just now';
+  input.value = '';
+  input.style.height = '';
+  renderChatMessages();
+}
+
+function closeChat() {
+  showScreen('main');
+  renderMessages();
+}
+
+function startNewChat() {
+  const type = document.getElementById('new-msg-type').value;
+  const name = document.getElementById('new-msg-name').value || 'New Chat';
+  const selected = [...document.querySelectorAll('#member-select-list input:checked')].map(i => i.value);
+  if (selected.length === 0) { showToast('Select at least one member', 'error'); return; }
+  const team = getActiveTeam();
+  const newChat = {
+    id: 'c' + Date.now(),
+    type: selected.length > 1 ? 'group' : type,
+    name: selected.length === 1 && type === 'direct' ? getMember(selected[0]).name : name,
+    members: selected,
+    lastMsg: 'No messages yet',
+    lastTime: 'Now',
+    unread: 0,
+    messages: []
+  };
+  team.chats.push(newChat);
+  closeModal('new-msg-modal');
+  openChat(newChat.id);
+  showToast('Chat started! 💬', 'success');
+}
+
+function autoResize(el) {
+  el.style.height = '';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+// ==================== PHOTOS ====================
+function renderPhotos() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('photos-content');
+  el.innerHTML = `<div class="fade-in">
+    <div class="section-header"><h3>Albums</h3><a onclick="openModal('new-album-modal')">+ New Album</a></div>
+    ${team.albums.map(album => `
+      <div class="photo-album">
+        <div class="photo-album-header">
+          <span style="font-size:20px;">📸</span>
+          <div>
+            <div class="photo-album-title">${album.title}</div>
+            <div class="photo-album-count">${album.photos.length} photos · ${album.date}</div>
+          </div>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+        </div>
+        <div class="photo-grid">
+          ${album.photos.map((p, i) => `
+            <div class="photo-item photo-item-placeholder" onclick="openLightbox('${p}','${album.title} - Photo ${i+1}')" style="background:${getPhotoColor(i)};display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;">${p}</div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${team.albums.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📷</div><div class="empty-state-title">No Photos Yet</div><div class="empty-state-sub">Add photos from your games and trainings</div></div>' : ''}
+  </div>`;
+}
+
+function getPhotoColor(i) {
+  const colors = ['#1a2e1a','#1a1a2e','#2e1a1a','#1a2a2e','#2e2a1a','#2a1a2e','#1a2e2a','#2e1a2a'];
+  return colors[i % colors.length];
+}
+
+function openLightbox(emoji, caption) {
+  document.getElementById('lightbox-caption').textContent = caption;
+  // Create a canvas-based image from emoji
+  document.getElementById('lightbox-img').style.display = 'none';
+  document.getElementById('lightbox-caption').innerHTML = `<div style="font-size:80px;">${emoji}</div><div>${caption}</div>`;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+function submitAlbum() {
+  const title = document.getElementById('album-title').value.trim() || 'New Album';
+  const team = getActiveTeam();
+  team.albums.unshift({ id: 'a' + Date.now(), title, date: new Date().toLocaleDateString('en',{day:'numeric',month:'short'}), photos: ['📸','⚽','💪'] });
+  closeModal('new-album-modal');
+  renderPhotos();
+  showToast('Album created! 📸', 'success');
+}
+
+function simulateUpload() {
+  showToast('Photos added (demo)', 'success');
+}
+
+// ==================== ATTENDANCE ====================
+function renderAttendance() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('attendance-content');
+  const upcoming = team.events.filter(e => e.date >= new Date().toISOString().split('T')[0]).sort((a,b) => a.date.localeCompare(b.date));
+
+  el.innerHTML = `<div class="fade-in">
+    <div class="section-header"><h3>Upcoming Events</h3></div>
+    <p style="padding:0 16px 8px;font-size:13px;color:var(--text3);">View and manage attendance for your team's events</p>
+    ${upcoming.map(event => {
+      const goingMembers = event.rsvp.going.map(id => ({ ...getMember(id), status: 'going' }));
+      const notGoingMembers = event.rsvp.notGoing.map(id => ({ ...getMember(id), status: 'not' }));
+      const maybeMembers = event.rsvp.maybe.map(id => ({ ...getMember(id), status: 'maybe' }));
+      const pending = team.members.filter(m => !event.rsvp.going.includes(m.id) && !event.rsvp.notGoing.includes(m.id) && !event.rsvp.maybe.includes(m.id));
+      const total = team.members.length;
+      const goingPct = Math.round((goingMembers.length / total) * 100);
+      const typeIcons = { game: '🏆', training: '💪', meeting: '📋', social: '🎉', trial: '🔍' };
+
+      return `<div class="attendance-event-card">
+        <div class="attendance-event-header">
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.7;font-weight:600;">${typeIcons[event.type]||'📅'} ${event.type}</div>
+            <div style="font-weight:700;font-size:16px;">${event.title}</div>
+            <div style="font-size:12px;opacity:.8;margin-top:2px;">${formatDate(event.date)} · ${event.time} · ${event.location}</div>
+          </div>
+          <button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);color:#fff;" onclick="sendReminder('${event.id}')">📣 Remind</button>
+        </div>
+        <div class="attendance-stats">
+          <div class="att-stat"><div class="att-stat-num att-stat-going">${goingMembers.length}</div><div class="att-stat-label">Going</div></div>
+          <div class="att-stat"><div class="att-stat-num att-stat-not">${notGoingMembers.length}</div><div class="att-stat-label">Can't Go</div></div>
+          <div class="att-stat"><div class="att-stat-num att-stat-maybe">${maybeMembers.length}</div><div class="att-stat-label">Maybe</div></div>
+          <div class="att-stat"><div class="att-stat-num" style="color:var(--text3);">${pending.length}</div><div class="att-stat-label">Pending</div></div>
+          <div style="flex:1;padding-left:8px;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Response rate</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(((total-pending.length)/total)*100)}%;"></div></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">${total - pending.length}/${total} responded</div>
+          </div>
+        </div>
+        <div class="attendance-list">
+          ${[...goingMembers, ...maybeMembers, ...notGoingMembers, ...pending.map(m=>({...m,status:'pending'}))].map(m => `
+            <div class="att-member">
+              <div class="att-status att-${m.status}">
+                ${m.status==='going'?'✓':m.status==='not'?'✗':m.status==='maybe'?'?':'–'}
+              </div>
+              <div class="avatar avatar-sm" style="background:var(--bg3);">${m.initials}</div>
+              <div style="flex:1;">
+                <div style="font-size:14px;font-weight:600;">${m.name}</div>
+                <div style="font-size:11px;color:var(--text3);">${m.role}</div>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:${m.status==='going'?'var(--primary)':m.status==='not'?'#da3633':m.status==='maybe'?'#f0a500':'var(--text3)'};">
+                ${m.status==='going'?'Going':m.status==='not'?"Can't Go":m.status==='maybe'?'Maybe':'No Response'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    ${upcoming.length === 0 ? '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-title">No Upcoming Events</div><div class="empty-state-sub">Create an event to track attendance</div></div>' : ''}
+  </div>`;
+}
+
+function sendReminder(eventId) {
+  showToast('Reminder sent to non-responders 📣', 'success');
+}
+
+// ==================== PROFILE ====================
+function renderProfile() {
+  const team = getActiveTeam();
+  const user = state.currentUser || { name: 'Demo User', initials: 'DU', role: 'coach', email: 'demo@wcsports.com' };
+  const el = document.getElementById('profile-content');
+
+  el.innerHTML = `<div class="fade-in">
+    <div class="profile-hero">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">${user.initials}</div>
+      </div>
+      <div class="profile-name">${user.name}</div>
+      <div class="profile-handle">${user.email || ''}</div>
+      <div style="margin-top:8px;">
+        <span class="role-badge role-${user.role || 'player'}">${user.role || 'player'}</span>
+      </div>
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="profile-stat-num">${state.teams.length}</div><div class="profile-stat-label">Teams</div></div>
+        <div class="profile-stat"><div class="profile-stat-num">${team?.events?.length || 0}</div><div class="profile-stat-label">Events</div></div>
+        <div class="profile-stat"><div class="profile-stat-num">${team?.events?.filter(e=>e.userRsvp==='going').length || 0}</div><div class="profile-stat-label">Attended</div></div>
+      </div>
+    </div>
+    <div style="margin:0 16px;"><div style="background:var(--bg2);border-radius:var(--radius);overflow:hidden;">
+      <div class="setting-row" onclick="showTeamCustomize()">
+        <div class="setting-row-icon" style="background:rgba(0,200,150,.15);">🎨</div>
+        <div class="setting-row-info"><div class="setting-row-label">Customize Team</div><div class="setting-row-sub">Colours, name, sport & more</div></div>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </div>
+      <div class="setting-row" onclick="showTeamCode()">
+        <div class="setting-row-icon" style="background:rgba(255,95,64,.15);">🔑</div>
+        <div class="setting-row-info"><div class="setting-row-label">Team Code</div><div class="setting-row-sub">${team?.code || '------'} · Share to invite members</div></div>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </div>
+      <div class="setting-row" onclick="openModal('add-team-modal')">
+        <div class="setting-row-icon" style="background:rgba(59,130,246,.15);">➕</div>
+        <div class="setting-row-info"><div class="setting-row-label">Add / Join Team</div><div class="setting-row-sub">Create a new team or join with code</div></div>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-icon" style="background:rgba(139,92,246,.15);">👥</div>
+        <div class="setting-row-info"><div class="setting-row-label">Members</div><div class="setting-row-sub">${team?.members?.length || 0} in ${team?.name || 'your team'}</div></div>
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-icon" style="background:rgba(240,165,0,.15);">🔔</div>
+        <div class="setting-row-info"><div class="setting-row-label">Notifications</div><div class="setting-row-sub">Manage alerts</div></div>
+        <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+      </div>
+      <div class="setting-row" onclick="doLogout()">
+        <div class="setting-row-icon" style="background:rgba(218,54,51,.15);">🚪</div>
+        <div class="setting-row-info"><div class="setting-row-label" style="color:#da3633;">Sign Out</div></div>
+      </div>
+    </div></div>
+    <div style="margin:20px 16px;background:var(--bg2);border-radius:var(--radius);overflow:hidden;">
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border);"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:1px;">My Teams</div></div>
+      ${state.teams.map(t => `
+        <div class="setting-row" onclick="selectTeam('${t.id}')">
+          <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:${t.primaryColor};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;color:#000;">${t.name.charAt(0)}</div>
+          <div class="setting-row-info"><div class="setting-row-label">${t.name}</div><div class="setting-row-sub">${t.sport ? t.sport.charAt(0).toUpperCase()+t.sport.slice(1) : ''} · ${t.ageGroup} · ${t.members?.length || 0} members</div></div>
+          ${t.id === state.activeTeamId ? '<span style="font-size:11px;background:rgba(0,200,150,.15);color:var(--primary);border:1px solid var(--primary);border-radius:20px;padding:2px 8px;font-weight:700;">Active</span>' : '<span class="role-badge role-'+t.myRole+'">'+t.myRole+'</span>'}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function showTeamCode() {
+  const team = getActiveTeam();
+  if (!team) return;
+  // Reuse a quick modal by injecting
+  document.getElementById('event-detail-title').textContent = 'Team Code';
+  document.getElementById('event-detail-body').innerHTML = `
+    <div class="team-code-display">
+      <div class="team-code">${team.code}</div>
+      <div class="team-code-sub">Share this with players to join ${team.name}</div>
+      <button class="btn btn-secondary btn-block" style="margin-top:12px;" onclick="copyTeamCode()">📋 Copy Code</button>
+    </div>
+    <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">Members join via <strong style="color:var(--text2);">Add Team → Join with Code</strong></div>
+  `;
+  openModal('event-detail-modal');
+}
+
+function copyTeamCode() {
+  const team = getActiveTeam();
+  if (navigator.clipboard) navigator.clipboard.writeText(team?.code || '');
+  showToast('Code copied! 📋', 'success');
+}
+
+function doLogout() {
+  state.currentUser = null;
+  showScreen('auth');
+}
+
+// ==================== TEAM SETUP ====================
+let currentSetupStep = 1;
+const totalSetupSteps = 3;
+
+function showTeamSetup(isJoin = false) {
+  state.setupMode = isJoin ? 'join' : 'create';
+  currentSetupStep = 1;
+  document.getElementById('setup-title').textContent = isJoin ? 'Join Team' : 'Create Team';
+
+  // Init color pickers
+  const primaryGrid = document.getElementById('primary-colors');
+  const secondaryGrid = document.getElementById('secondary-colors');
+  primaryGrid.innerHTML = COLOR_PRESETS.map(c => `<div class="color-swatch" style="background:${c};" onclick="selectColor('primary','${c}',this)"></div>`).join('');
+  secondaryGrid.innerHTML = ['#0d1117','#161b22','#1e3a5f','#1a1a2e','#2e1a1a','#2e2a1a','#fff','#f5f5f5'].map(c => `<div class="color-swatch" style="background:${c};${c==='#fff'?'border:1px solid var(--border);':''}" onclick="selectColor('secondary','${c}',this)"></div>`).join('');
+
+  document.getElementById('primary-custom').oninput = e => updateColorPreview(e.target.value, null, null);
+  document.getElementById('secondary-custom').oninput = e => updateColorPreview(null, e.target.value, null);
+  document.getElementById('accent-custom').oninput = e => updateColorPreview(null, null, e.target.value);
+
+  renderSetupSteps();
+  showScreen('team-setup');
+}
+
+function renderSetupSteps() {
+  const indicator = document.getElementById('step-indicator');
+  indicator.innerHTML = Array.from({length:totalSetupSteps}, (_,i) => `<div class="step-dot ${i+1===currentSetupStep?'active':''}"></div>`).join('');
+
+  document.querySelectorAll('.onboard-step').forEach((s,i) => s.classList.toggle('active', i+1 === currentSetupStep));
+
+  const backBtn = document.getElementById('setup-back-btn');
+  const nextBtn = document.getElementById('setup-next-btn');
+  backBtn.style.display = currentSetupStep > 1 ? 'block' : 'none';
+
+  if (currentSetupStep === totalSetupSteps) {
+    nextBtn.textContent = 'Go to Team →';
+    nextBtn.onclick = () => finishSetup();
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.onclick = () => setupStep(1);
+  }
+}
+
+function setupStep(dir) {
+  if (dir === 1 && currentSetupStep === 1) {
+    // Validate
+    const name = document.getElementById('new-team-name').value.trim();
+    if (!name) { showToast('Please enter a team name', 'error'); return; }
+    // If step 2, create code ready
+    if (currentSetupStep + 1 === 3) {
+      const code = generateCode();
+      document.getElementById('new-team-code').textContent = code;
+    }
+  }
+  currentSetupStep = Math.max(1, Math.min(totalSetupSteps, currentSetupStep + dir));
+  if (currentSetupStep === 3) {
+    // Actually create the team
+    createTeamFromSetup();
+  }
+  renderSetupSteps();
+}
+
+function createTeamFromSetup() {
+  const name = document.getElementById('new-team-name').value.trim() || 'New Team';
+  const sport = document.getElementById('new-team-sport').value;
+  const sportEmojis = {football:'⚽',rugby:'🏉',basketball:'🏀',cricket:'🏏',tennis:'🎾',hockey:'🏒',netball:'🏐',swimming:'🏊',athletics:'🏃',cycling:'🚴',golf:'⛳',baseball:'⚾',softball:'🥎',volleyball:'🏐',other:'🎯'};
+  const age = document.getElementById('new-team-age').options[document.getElementById('new-team-age').selectedIndex].text;
+  const season = document.getElementById('new-team-season').value || '2025';
+  const role = document.getElementById('new-team-role').value;
+  const primary = document.getElementById('primary-custom').value || '#00c896';
+  const secondary = document.getElementById('secondary-custom').value || '#0d1117';
+  const accent = document.getElementById('accent-custom').value || '#ff5f40';
+  const code = document.getElementById('new-team-code').textContent;
+
+  const newCode = code === '------' ? generateCode() : code;
+  document.getElementById('new-team-code').textContent = newCode;
+
+  const newTeam = {
+    id: 'team' + Date.now(),
+    name,
+    sport,
+    sportEmoji: sportEmojis[sport] || '🎯',
+    ageGroup: age,
+    season,
+    myRole: role,
+    code: newCode,
+    primaryColor: primary,
+    secondaryColor: secondary,
+    accentColor: accent,
+    members: [{ id: 'me', name: state.currentUser?.name || 'You', role, initials: state.currentUser?.initials || 'ME', online: true }],
+    posts: [],
+    events: [],
+    chats: [{ id: 'tc'+Date.now(), type:'group', name:`${name} Chat`, members:['me'], lastMsg:'Welcome to '+name+'!', lastTime:'Now', unread:0, messages:[{sender:'m1',text:'Welcome to '+name+'! Let\'s go! 🏆',time:'Now'}] }],
+    albums: [],
+  };
+  state.teams.push(newTeam);
+  state.activeTeamId = newTeam.id;
+  applyTeamTheme();
+}
+
+function finishSetup() {
+  closeTeamSetup();
+  renderTeamSwitcher();
+  switchPage('home');
+  showToast('Team created! 🎉', 'success');
+}
+
+function closeTeamSetup() {
+  showScreen('main');
+  renderTeamSwitcher();
+  renderHome();
+}
+
+function selectColor(type, color, el) {
+  if (type === 'primary') {
+    document.getElementById('primary-custom').value = color;
+    document.querySelectorAll('#primary-colors .color-swatch').forEach(s => s.classList.remove('selected'));
+  } else {
+    document.getElementById('secondary-custom').value = color;
+    document.querySelectorAll('#secondary-colors .color-swatch').forEach(s => s.classList.remove('selected'));
+  }
+  el.classList.add('selected');
+  updateColorPreview();
+}
+
+function updateColorPreview(primary, secondary, accent) {
+  const p = primary || document.getElementById('primary-custom').value;
+  const s = secondary || document.getElementById('secondary-custom').value;
+  const a = accent || document.getElementById('accent-custom').value;
+  const preview = document.getElementById('color-preview');
+  if (preview) {
+    preview.style.background = `linear-gradient(135deg, ${p}, ${s})`;
+    preview.style.color = isLight(p) ? '#000' : '#fff';
+    preview.textContent = document.getElementById('new-team-name')?.value || 'TEAM NAME';
+  }
+}
+
+function isLight(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return (r*299+g*587+b*114)/1000 > 128;
+}
+
+// ==================== TEAM CUSTOMIZE ====================
+function showTeamCustomize() {
+  const team = getActiveTeam();
+  if (!team) return;
+  const el = document.getElementById('customize-content');
+  el.innerHTML = `<div class="fade-in">
+    <div class="section-header"><h3>Team Info</h3></div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px;">
+      <div class="field-group"><label>Team Name</label><input type="text" id="cust-name" value="${team.name}"></div>
+      <div class="field-group"><label>Sport</label>
+        <select id="cust-sport">
+          ${['football','rugby','basketball','cricket','tennis','hockey','netball','swimming','athletics','cycling','golf','baseball','softball','volleyball','other'].map(s=>`<option value="${s}" ${team.sport===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group"><label>Age Group</label><input type="text" id="cust-age" value="${team.ageGroup}"></div>
+      <div class="field-group"><label>Season</label><input type="text" id="cust-season" value="${team.season}"></div>
+    </div>
+    <div class="section-header"><h3>Team Colours</h3></div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div class="field-group"><label>Primary Colour</label><input type="color" id="cust-primary" value="${team.primaryColor}" style="width:100%;height:44px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;"></div>
+      <div class="field-group"><label>Secondary Colour</label><input type="color" id="cust-secondary" value="${team.secondaryColor}" style="width:100%;height:44px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;"></div>
+      <div class="field-group"><label>Accent Colour</label><input type="color" id="cust-accent" value="${team.accentColor}" style="width:100%;height:44px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;"></div>
+    </div>
+    <div class="section-header"><h3>Quick Colour Presets</h3></div>
+    <div style="padding:0 16px 16px;">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+        ${[
+          {name:'Forest Green',p:'#16a34a',s:'#052e16',a:'#facc15'},
+          {name:'Ocean Blue',p:'#2563eb',s:'#0f172a',a:'#38bdf8'},
+          {name:'Sunset Red',p:'#dc2626',s:'#1c0a0a',a:'#fb923c'},
+          {name:'Royal Purple',p:'#7c3aed',s:'#1e0035',a:'#e879f9'},
+          {name:'Midnight',p:'#e2e8f0',s:'#020617',a:'#38bdf8'},
+          {name:'Gold Rush',p:'#f59e0b',s:'#1c1002',a:'#ef4444'},
+        ].map(preset => `
+          <div onclick="applyPreset('${preset.p}','${preset.s}','${preset.a}')" style="cursor:pointer;border-radius:var(--radius-sm);overflow:hidden;border:2px solid var(--border);">
+            <div style="height:32px;background:linear-gradient(135deg,${preset.p},${preset.s});"></div>
+            <div style="padding:6px 8px;background:var(--bg2);font-size:12px;font-weight:600;">${preset.name}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="section-header"><h3>Team Code</h3></div>
+    <div class="team-code-display" style="margin:0 16px 16px;">
+      <div class="team-code">${team.code}</div>
+      <div class="team-code-sub">Share with players to join this team</div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="copyTeamCode()">📋 Copy</button>
+        <button class="btn btn-secondary" style="flex:1;" onclick="regenerateCode()">🔄 New Code</button>
+      </div>
+    </div>
+    <div class="section-header"><h3>Danger Zone</h3></div>
+    <div style="padding:0 16px 32px;">
+      <button class="btn btn-danger btn-block" onclick="confirmDeleteTeam()">🗑 Delete Team</button>
+    </div>
+  </div>`;
+
+  showScreen('team-customize');
+}
+
+function applyPreset(p, s, a) {
+  document.getElementById('cust-primary').value = p;
+  document.getElementById('cust-secondary').value = s;
+  document.getElementById('cust-accent').value = a;
+  showToast('Preset applied! Hit Save to confirm', 'success');
+}
+
+function saveTeamCustomize() {
+  const team = getActiveTeam();
+  if (!team) return;
+  team.name = document.getElementById('cust-name').value || team.name;
+  team.sport = document.getElementById('cust-sport').value;
+  team.ageGroup = document.getElementById('cust-age').value || team.ageGroup;
+  team.season = document.getElementById('cust-season').value || team.season;
+  team.primaryColor = document.getElementById('cust-primary').value;
+  team.secondaryColor = document.getElementById('cust-secondary').value;
+  team.accentColor = document.getElementById('cust-accent').value;
+  applyTeamTheme();
+  showScreen('main');
+  renderTeamSwitcher();
+  switchPage('profile');
+  showToast('Team updated! ✅', 'success');
+}
+
+function regenerateCode() {
+  const team = getActiveTeam();
+  if (!team) return;
+  team.code = generateCode();
+  document.querySelector('.team-code').textContent = team.code;
+  showToast('New code generated! 🔑', 'success');
+}
+
+function confirmDeleteTeam() {
+  if (state.teams.length <= 1) { showToast('Cannot delete your only team', 'error'); return; }
+  if (confirm('Delete this team? This cannot be undone.')) {
+    state.teams = state.teams.filter(t => t.id !== state.activeTeamId);
+    state.activeTeamId = state.teams[0].id;
+    applyTeamTheme();
+    showScreen('main');
+    renderTeamSwitcher();
+    switchPage('home');
+    showToast('Team deleted', 'success');
+  }
+}
+
+// ==================== JOIN TEAM ====================
+function joinTeamByCode() {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (code.length < 4) { showToast('Enter a valid team code', 'error'); return; }
+  // Check if existing team
+  const existing = state.teams.find(t => t.code === code);
+  if (existing) { showToast(`Already in ${existing.name}!`, 'error'); return; }
+  // Simulate joining
+  const mockTeam = {
+    id: 'team' + Date.now(),
+    name: 'Joined Team',
+    sport: 'football',
+    sportEmoji: '⚽',
+    ageGroup: 'Senior',
+    season: '2025',
+    myRole: 'player',
+    code,
+    primaryColor: '#3b82f6',
+    secondaryColor: '#0f172a',
+    accentColor: '#f59e0b',
+    members: SAMPLE_MEMBERS.slice(0, 8),
+    posts: [{ id: 'jp1', author: 'm1', text: 'Welcome to the team! 🎉', time: 'Just now', type: 'update', likes: 1, pinned: false, comments: 0 }],
+    events: [],
+    chats: [{ id: 'jc1', type:'group', name:'Team Chat', members:['m1','m2','m3'], lastMsg:'Welcome!', lastTime:'Now', unread:1, messages:[{sender:'m1',text:'Welcome to the team!',time:'Now'}] }],
+    albums: [],
+  };
+  state.teams.push(mockTeam);
+  state.activeTeamId = mockTeam.id;
+  applyTeamTheme();
+  closeModal('join-team-modal');
+  renderTeamSwitcher();
+  switchPage('home');
+  showToast(`Joined team! Welcome 🎉`, 'success');
+}
+
+// ==================== MODALS ====================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modal on overlay tap
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ==================== TOAST ====================
+let toastTimeout;
+function showToast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ==================== KEYBOARD ====================
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// ==================== EVENT DATE DEFAULT ====================
+document.getElementById('event-date').valueAsDate = new Date();
+
+console.log('WC Sports loaded ✅');
+</script>
+</body>
+</html>
