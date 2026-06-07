@@ -1,0 +1,87 @@
+
+<!-- ADD THIS SECTION ABOVE THE FOOTER -->
+
+<section class="fade">
+<h2 style="font-size:3rem;margin-bottom:30px">Opening Hours</h2>
+
+<div id="open-status" style="background:white;padding:25px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1);max-width:600px">
+<h3 id="status-text">Checking status...</h3>
+<p>Timezone: NZGMT / New Zealand Time</p>
+<br>
+<p>Sunday: 7am–5pm</p>
+<p>Monday: 7am–5pm</p>
+<p>Tuesday: 7am–5pm</p>
+<p>Wednesday: 7am–5pm</p>
+<p>Thursday: 7am–5pm</p>
+<p>Friday: 7am–5pm</p>
+<p>Saturday: 7am–5pm</p>
+</div>
+</section>
+
+<section class="fade">
+<h2 style="font-size:3rem;margin-bottom:30px">Find Us</h2>
+
+<a href="https://maps.google.com/?q=79+Clyde+Road+Browns+Bay+Auckland"
+target="_blank"
+class="btn">
+📍 Open Google Maps
+</a>
+
+<br><br>
+
+<iframe
+src="https://maps.google.com/maps?q=79%20Clyde%20Road%20Browns%20Bay%20Auckland&t=&z=15&ie=UTF8&iwloc=&output=embed"
+width="100%"
+height="450"
+style="border:0;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1)"
+allowfullscreen=""
+loading="lazy">
+</iframe>
+</section>
+
+<section class="fade">
+<h2 style="font-size:3rem;margin-bottom:30px">Follow Us</h2>
+
+<a href="https://www.instagram.com/explore/locations/1626733074026924/sugar-n-cup/"
+target="_blank"
+class="btn">
+📸 Visit Instagram
+</a>
+</section>
+
+<section class="fade">
+<h2 style="font-size:3rem;margin-bottom:30px">Inside Sugar n Cup</h2>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+
+<img src="image(2).png" style="width:100%;border-radius:20px;cursor:pointer" onclick="openLightbox(this.src)">
+<img src="image(3).png" style="width:100%;border-radius:20px;cursor:pointer" onclick="openLightbox(this.src)">
+<img src="image(4).png" style="width:100%;border-radius:20px;cursor:pointer" onclick="openLightbox(this.src)">
+<img src="image(5).png" style="width:100%;border-radius:20px;cursor:pointer" onclick="openLightbox(this.src)">
+
+</div>
+</section>
+
+<div id="lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99999;justify-content:center;align-items:center" onclick="this.style.display='none'">
+<img id="lightbox-img" style="max-width:90%;max-height:90%;border-radius:20px">
+</div>
+
+<script>
+function openLightbox(src){
+document.getElementById('lightbox').style.display='flex';
+document.getElementById('lightbox-img').src=src;
+}
+
+function updateOpenStatus(){
+const nzTime = new Date().toLocaleString("en-NZ",{timeZone:"Pacific/Auckland"});
+const now = new Date(nzTime);
+const hour = now.getHours();
+
+const open = hour >= 7 && hour < 17;
+
+document.getElementById("status-text").innerHTML =
+open ? "🟢 Open Now" : "🔴 Closed Now";
+}
+
+updateOpenStatus();
+</script>
